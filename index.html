@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YTDownloader - Download YouTube Videos</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      color: #333;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    header {
+      text-align: center;
+      padding: 30px 0;
+      color: white;
+    }
+    
+    header h1 {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    
+    .logo {
+      font-size: 3rem;
+      color: #ff0000;
+      margin-bottom: 15px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .download-box {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      margin-bottom: 30px;
+    }
+    
+    .input-group {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    
+    .input-group input {
+      flex: 1;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 8px 0 0 8px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    
+    .input-group input:focus {
+      border-color: #1a73e8;
+    }
+    
+    .input-group button {
+      padding: 15px 25px;
+      background: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    
+    .input-group button:hover {
+      background: #0d62c9;
+    }
+    
+    .video-preview {
+      text-align: center;
+      margin: 20px 0;
+      display: none;
+    }
+    
+    .video-preview.active {
+      display: block;
+    }
+    
+    .video-preview img {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .video-info {
+      margin: 15px 0;
+    }
+    
+    .video-info h3 {
+      margin-bottom: 10px;
+      color: #1a2a6c;
+    }
+    
+    .resolution-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 25px 0;
+    }
+    
+    .resolution-option {
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .resolution-option:hover {
+      border-color: #1a73e8;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .resolution-option.selected {
+      border-color: #1a73e8;
+      background: #f0f7ff;
+    }
+    
+    .resolution-option h4 {
+      color: #1a2a6c;
+      margin-bottom: 5px;
+    }
+    
+    .resolution-option p {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .download-btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 20px;
+    }
+    
+    .download-btn:hover {
+      background: #3d8b40;
+    }
+    
+    .download-btn:disabled {
+      background: #a5d6a7;
+      cursor: not-allowed;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 20px 0;
+    }
+    
+    .loading.active {
+      display: block;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #1a73e8;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      color: white;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    
+    @media (max-width: 768px) {
+      .input-group {
+        flex-direction: column;
+      }
+      
+      .input-group input {
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+      
+      .input-group button {
+        border-radius: 8px;
+      }
+      
+      .resolution-options {
+        grid-template-columns: 1fr;
+      }
+      
+      header h1 {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <i class="fab fa-youtube"></i>
+      </div>
+      <h1>YTDownloader</h1>
+      <p>Download YouTube videos in high quality for free</p>
+    </header>
+
+    <div class="download-box">
+      <div class="input-group">
+        <input type="text" id="video-url" placeholder="Paste YouTube URL here...">
+        <button id="fetch-btn">Fetch Video</button>
+      </div>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Fetching video information...</p>
+      </div>
+
+      <div class="video-preview" id="video-preview">
+        <img id="thumbnail" src="" alt="Video thumbnail">
+        <div class="video-info">
+          <h3 id="video-title">Video Title</h3>
+        </div>
+
+        <h3>Select Resolution:</h3>
+        <div class="resolution-options">
+          <div class="resolution-option" data-resolution="highest">
+            <h4>Best Quality</h4>
+            <p>Highest Resolution • MP4</p>
+          </div>
+          <div class="resolution-option" data-resolution="lowest">
+            <h4>Low Quality</h4>
+            <p>Smallest File Size • MP4</p>
+          </div>
+          <div class="resolution-option" data-resolution="highestaudio">
+            <h4>Audio Only</h4>
+            <p>MP3 • 128kbps</p>
+          </div>
+        </div>
+
+        <button class="download-btn" id="download-btn" disabled>Download Video</button>
+      </div>
+    </div>
+    
+    <footer>
+      <p>Disclaimer: This is a frontend demonstration. Actual video downloading would require a backend service.</p>
+      <p>© 2023 YTDownloader. For educational purposes only.</p>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const videoUrl = document.getElementById("video-url");
+      const fetchBtn = document.getElementById("fetch-btn");
+      const videoPreview = document.getElementById("video-preview");
+      const loading = document.getElementById("loading");
+      const thumbnail = document.getElementById("thumbnail");
+      const videoTitle = document.getElementById("video-title");
+      const resolutionOptions = document.querySelectorAll(".resolution-option");
+      const downloadBtn = document.getElementById("download-btn");
+
+      let selectedResolution = null;
+      let currentUrl = null;
+
+      // Fetch video info (mock thumbnail + title for now)
+      fetchBtn.addEventListener("click", async function () {
+        if (!videoUrl.value) {
+          alert("Please enter a YouTube URL");
+          return;
+        }
+
+        currentUrl = videoUrl.value;
+
+        loading.classList.add("active");
+        videoPreview.classList.remove("active");
+
+        try {
+          // Simulate API call with timeout
+          setTimeout(() => {
+            // Set mock data for demonstration
+            thumbnail.src = "https://i.ytimg.com/vi/7E7YV-6oNA8/maxresdefault.jpg";
+            videoTitle.textContent = "How to Create a YouTube Downloader Website";
+            
+            loading.classList.remove("active");
+            videoPreview.classList.add("active");
+          }, 1500);
+        } catch (err) {
+          console.error(err);
+          alert("Failed to fetch video info");
+          loading.classList.remove("active");
+        }
+      });
+
+      // Select resolution
+      resolutionOptions.forEach(option => {
+        option.addEventListener("click", function () {
+          resolutionOptions.forEach(opt => opt.classList.remove("selected"));
+          this.classList.add("selected");
+          selectedResolution = this.getAttribute("data-resolution");
+          downloadBtn.disabled = false;
+        });
+      });
+
+      // Download video
+      downloadBtn.addEventListener("click", function () {
+        if (!selectedResolution || !currentUrl) {
+          alert("Please select a resolution");
+          return;
+        }
+
+        alert(`This is a frontend demonstration. In a real application, this would download the video in ${selectedResolution} quality.`);
+        
+        // In a real application, this would be:
+        // window.location.href = `http://localhost:5000/download?url=${encodeURIComponent(currentUrl)}&quality=${selectedResolution}`;
+      });
+    });
+  </script>
+</body>
+</html>
