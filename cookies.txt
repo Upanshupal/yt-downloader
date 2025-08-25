@@ -1,0 +1,7 @@
+ydl_opts = {
+    "format": f"bestvideo[height<={quality[:-1]}]+bestaudio/best[height<={quality[:-1]}]",
+    "noplaylist": True,
+    "quiet": True,
+    "outtmpl": "%(title)s.%(ext)s",
+    "cookiefile": "cookies.txt"   # 👈 Add this line
+}
