@@ -73,7 +73,7 @@
     <div class="disclaimer"><strong>Disclaimer:</strong> For personal/educational use only. Respect copyright & YouTube Terms of Service.</div>
   </div>
 
-  <footer><p>YouTube Video Downloader • Local Demo</p></footer>
+  <footer><p>YouTube Video Downloader • Demo</p></footer>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -88,9 +88,8 @@
       const thumbnail = document.getElementById("thumbnail");
       const formatGrid = document.getElementById("format-grid");
 
-      // <-- CHANGE HERE IF YOUR BACKEND RUNS ON DIFFERENT PORT/HOST -->
-      const API_BASE_URL = "http://127.0.0.1:10159";
-      // ----------------------------------------------------------------
+      // ✅ Backend deployed on Render
+      const API_BASE_URL = "https://yt-downloader-5.onrender.com";
 
       fetchBtn.addEventListener("click", fetchVideoInfo);
       youtubeUrlInput.addEventListener("keypress", (e) => { if (e.key === "Enter") fetchVideoInfo(); });
@@ -142,7 +141,6 @@
             let quality = fmt.height ? (fmt.height + "p") : (fmt.format_note || (fmt.ext || "").toUpperCase());
             btn.innerHTML = `<strong>${quality}</strong><div>${(fmt.ext||"").toUpperCase()}</div><div>${sizeMB}</div>`;
             btn.onclick = () => {
-              // trigger download - backend will stream file
               const downloadUrl = `${API_BASE_URL}/api/download?url=${encodeURIComponent(url)}&format_id=${encodeURIComponent(fmt.format_id||"best")}`;
               window.open(downloadUrl, "_blank");
             };
